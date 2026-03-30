@@ -26,6 +26,12 @@ const obligacionAttr = computed(() =>
   attributesStore.attributesWithValues.find(a => a.name.toLowerCase().includes('obligaci'))
 )
 
+const movimientoAttr = computed(() =>
+  attributesStore.attributesWithValues.find(a =>
+    a.name.toLowerCase().includes('movimiento') || a.name.toLowerCase().includes('intensidad')
+  )
+)
+
 const obligacionSiValueId = computed(() => {
   if (!obligacionAttr.value) return null
   const v = obligacionAttr.value.values.find(v =>
@@ -47,6 +53,22 @@ const rowValues = computed(() => {
 function isObligacion(activity) {
   if (!obligacionAttr.value || !obligacionSiValueId.value) return false
   return activity.valuesByAttribute?.[obligacionAttr.value.id] === obligacionSiValueId.value
+}
+
+function getMovementTier(activity) {
+  if (!movimientoAttr.value) return 0
+  const valId = activity.valuesByAttribute?.[movimientoAttr.value.id]
+  if (!valId) return 0
+  const val = movimientoAttr.value.values.find(v => v.id === valId)
+  if (!val) return 0
+  return movimientoAttr.value.values.indexOf(val)
+}
+
+function getActivityColor(activity) {
+  const tier = getMovementTier(activity)
+  if (tier >= 2) return '#dc2626'
+  if (tier === 1) return '#ea580c'
+  return '#1a1a1a'
 }
 
 function getActivitiesForCell(colVal, rowVal) {
@@ -79,16 +101,24 @@ function pseudoRandom(str, salt = 0) {
   return (hash & 0x7fffffff) / 0x7fffffff
 }
 
-function getXInZone(activity, zoneIndex, totalZones) {
+function getXInZone(activity, zoneIndex, totalZones, cellIndex, cellTotal) {
   const zoneWidth = 100 / totalZones
   const start = zoneIndex * zoneWidth
-  return start + 8 + pseudoRandom(activity.id, 2) * (zoneWidth - 16)
+  const padding = 15
+  const usable = zoneWidth - padding * 2
+  const slot = cellTotal > 1 ? cellIndex / (cellTotal - 1) : 0.5
+  const jitter = (pseudoRandom(activity.id, 2) - 0.5) * 12
+  return start + padding + slot * usable + jitter
 }
 
-function getYInBand(activity, bandIndex, totalBands) {
+function getYInBand(activity, bandIndex, totalBands, cellIndex, cellTotal) {
   const bandHeight = 100 / totalBands
   const start = bandIndex * bandHeight
-  return start + 12 + pseudoRandom(activity.id, 1) * (bandHeight - 24)
+  const padding = 15
+  const usable = bandHeight - padding * 2
+  const slot = cellTotal > 1 ? cellIndex / (cellTotal - 1) : 0.5
+  const jitter = (pseudoRandom(activity.id, 1) - 0.5) * 10
+  return start + padding + slot * usable + jitter
 }
 
 async function handleClick(activityId) {
@@ -157,14 +187,14 @@ async function handleClick(activityId) {
       <template v-for="(col, ci) in colValues" :key="'col-'+col.id">
         <template v-for="(row, ri) in rowValues" :key="'row-'+row.id">
           <button
-            v-for="act in getActivitiesForCell(col, row)"
+            v-for="(act, ai) in getActivitiesForCell(col, row)"
             :key="act.id"
             class="absolute font-bold whitespace-nowrap cursor-pointer transition-all duration-300 hover:scale-110 hover:opacity-80"
             :class="recentlyLogged.has(act.id) ? 'opacity-40' : ''"
             :style="{
-              left: getXInZone(act, ci, colValues.length) + '%',
-              top: getYInBand(act, ri, rowValues.length) + '%',
-              color: recentlyLogged.has(act.id) ? '#16a34a' : '#1a1a1a',
+              left: getXInZone(act, ci, colValues.length, ai, getActivitiesForCell(col, row).length) + '%',
+              top: getYInBand(act, ri, rowValues.length, ai, getActivitiesForCell(col, row).length) + '%',
+              color: recentlyLogged.has(act.id) ? '#16a34a' : getActivityColor(act),
               fontSize: '1.35rem',
             }"
             @click="handleClick(act.id)"

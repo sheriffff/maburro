@@ -3,25 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useAttributesStore } from '../stores/attributes'
 import { useActivitiesStore } from '../stores/activities'
 import DrawingView from '../components/drawing/DrawingView.vue'
-import ActivityModal from '../components/matrix/ActivityModal.vue'
 
 const attributesStore = useAttributesStore()
 const activitiesStore = useActivitiesStore()
 
 const loaded = ref(false)
-const modalOpen = ref(false)
-const editingActivity = ref(null)
 const showObligaciones = ref(false)
-
-function openNewActivity() {
-  editingActivity.value = null
-  modalOpen.value = true
-}
-
-function closeModal() {
-  modalOpen.value = false
-  editingActivity.value = null
-}
 
 onMounted(async () => {
   await Promise.all([
@@ -36,17 +23,7 @@ onMounted(async () => {
   <div>
     <div v-if="!loaded" class="text-center text-gray-400 mt-16 text-sm">Cargando...</div>
     <template v-else>
-      <div class="flex items-center justify-between mb-4">
-        <button
-          class="flex items-center gap-2 px-4 py-2.5 bg-brand-500 text-white text-sm font-medium rounded-xl hover:bg-brand-600 shadow-sm hover:shadow-md transition-all active:scale-[0.97]"
-          @click="openNewActivity"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
-          </svg>
-          Nueva actividad
-        </button>
-
+      <div class="flex items-center justify-end mb-4">
         <label class="flex items-center gap-2.5 cursor-pointer select-none">
           <span class="text-sm font-medium text-gray-600">Mostrar obligaciones</span>
           <button
@@ -63,10 +40,7 @@ onMounted(async () => {
           </button>
         </label>
       </div>
-
       <DrawingView :show-obligaciones="showObligaciones" />
     </template>
-
-    <ActivityModal :open="modalOpen" :activity="editingActivity" @close="closeModal" />
   </div>
 </template>

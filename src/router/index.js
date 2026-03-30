@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MatrixView from '../views/MatrixView.vue'
-import ConfigView from '../views/ConfigView.vue'
+import HazView from '../views/HazView.vue'
+import ActivitiesView from '../views/ActivitiesView.vue'
+import AttributesView from '../views/AttributesView.vue'
 
 const routes = [
-  { path: '/', name: 'matrix', component: MatrixView },
-  { path: '/config', name: 'config', component: ConfigView },
+  { path: '/', name: 'haz', component: HazView },
+  { path: '/actividades', name: 'actividades', component: ActivitiesView },
+  { path: '/atributos', name: 'atributos', component: AttributesView },
 ]
 
 export const router = createRouter({
