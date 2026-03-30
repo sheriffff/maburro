@@ -8,42 +8,6 @@ Una webapp personal para esos momentos de "me aburro". Abres la app, ves tus act
 
 ## Cómo funciona
 
-- **Vista principal** — Tus actividades organizadas en columnas (Casa / Fuera) y filas (1h / 2h / >2h)
-- **Obligaciones** — Un toggle para mostrar u ocultar las tareas obligatorias
-- **Registro** — Click en una actividad y queda guardado qué hiciste y cuándo
+- **Vista principal**
+- **Obligaciones** — Un toggle para mostrarlas u ocultarlas
 - **Config** — Crea y edita los atributos que definen tus actividades
-
-## Stack
-
-- Vue 3 + Vite + Tailwind CSS v4
-- Supabase (PostgreSQL)
-- Vercel
-
-## Setup
-
-```bash
-npm install
-```
-
-Copia `.env` y rellena con tus credenciales de Supabase:
-
-```
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-```
-
-Ejecuta el schema en Supabase SQL Editor:
-
-```bash
-# El archivo está en supabase/schema.sql
-```
-
-Arranca:
-
-```bash
-npm run dev
-```
-
-## Pensado para
-
-Tablet en horizontal. También funciona en escritorio y en móvil apaisado.
